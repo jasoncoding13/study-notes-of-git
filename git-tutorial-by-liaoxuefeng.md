@@ -963,5 +963,5 @@ To github.com:jason-ding13/study-notes-of-git.git
 
 通过远程分支可见本地合并分支成功！同时，远程分支`dev`已删除。
 
-nofeature![merge-branch-into-current-HEAD.png](./merge-branch-into-current-HEAD.png)
+![merge-branch-into-current-HEAD.png](./merge-branch-into-current-HEAD.png)
 

@@ -9,6 +9,7 @@
 2. 版本库
 3. 版本控制
 4. 远程仓库
+5. 分支管理
 
 ## git简介
 git是分布式版本控制系统。
@@ -835,4 +836,132 @@ $ cd hello-world
 $ ls -ah
 .  ..  .git  .gitignore  hello-world.py  README.md
 ```
+
+## 分支管理
+对于分支管理的介绍，引用原文的描述：
+> 分支在实际中有什么用呢？假设你准备开发一个新功能，但是需要两周才能完
+    成，第一周你写了50%的代码，如果立刻提交，由于代码还没写完，不完整的
+    代码库会导致别人不能干活了。如果等代码全部写完再一次提交，又存在丢失
+    每天进度的巨大风险。
+    现在有了分支，就不用怕了。你创建了一个属于你自己的分支，别人看不到，
+    还继续在原来的分支上正常工作，而你在自己的分支上干活，想提交就提交，
+    直到开发完毕后，再一次性合并到原来的分支上，这样，既安全，又不影响别
+    人工作。
+
+
+### 创建与合并分支
+使用`git checkout -b <new_branch>`
+创建并切换至新分支。  
+实际等同于先后执行`git branch <new_branch>`创建新分支与
+`git checkout <branch>`切换至其它分支。  
+此外，可使用`git branch`列出所有分支，其中`*`表示当前所在分支。
+```
+$ pwd 
+/home/jason/Repository/study-notes-of-git
+$ git checkout -b dev
+切换到一个新分支 'dev'
+$ git branch 
+* dev
+  master
+```
+
+已创建切换`dev`分支后，把目前需添加的关于学习git的相关文件复制至`study-notes-of-git`目录下，包含6个png，1个已更新的markdown。  
+把7个文件添加至暂存区，提交修改，推送远程分支。
+```
+$ pwd
+/home/jason/Repository/study-notes-of-git
+$ git status
+位于分支 dev
+尚未暂存以备提交的变更：
+  （使用 "git add <文件>..." 更新要提交的内容）
+  （使用 "git checkout -- <文件>..." 丢弃工作区的改动）
+
+	修改：     git-tutorial-by-liaoxuefeng.md
+
+未跟踪的文件:
+  （使用 "git add <文件>..." 以包含要提交的内容）
+
+	add-a-remote-repository-1.png
+	add-a-remote-repository-2.png
+	add-a-remote-repository-3.png
+	add-a-remote-repository-4.png
+	add-a-remote-repository-5.png
+	clone-from-a-remote-repository.png
+
+修改尚未加入提交（使用 "git add" 和/或 "git commit -a"）
+$ git add add-a-remote-repository-*.png clone-from-a-remote-repository.png git-tutorial-by-liaoxuefeng.md 
+$ git commit -m 'add png of add-a-remote-repository, png of clone-from-a-remote-repository, modify markdown of git-tutorial-by-liaoxuefeng(更新远程仓库部分).'
+[dev 8334be5] add png of add-a-remote-repository, png of clone-from-a-remote-repository, modify markdown of git-tutorial-by-liaoxuefeng(更新远程仓库部分).
+ 7 files changed, 153 insertions(+), 11 deletions(-)
+ create mode 100644 add-a-remote-repository-1.png
+ create mode 100644 add-a-remote-repository-2.png
+ create mode 100644 add-a-remote-repository-3.png
+ create mode 100644 add-a-remote-repository-4.png
+ create mode 100644 add-a-remote-repository-5.png
+ create mode 100644 clone-from-a-remote-repository.png
+$ git push -u origin dev
+对象计数中: 9, 完成.
+Delta compression using up to 4 threads.
+压缩对象中: 100% (9/9), 完成.
+写入对象中: 100% (9/9), 605.43 KiB | 4.55 MiB/s, 完成.
+Total 9 (delta 1), reused 0 (delta 0)
+remote: Resolving deltas: 100% (1/1), completed with 1 local object.
+To github.com:jason-ding13/study-notes-of-git.git
+ * [new branch]      dev -> dev
+分支 dev 设置为跟踪来自 origin 的远程分支 dev。
+```
+
+远程新分支`dev`推送成功！
+
+![create-a-new-branch.png](./create-a-new-branch.png)
+
+合并分支首先使用`git checkout <branch>`切换本地分支至`<branch>`，  
+然后使用`git merge <branch>`合并`<branch>`至当前所在分支。  
+此处将合并`dev`与`master`，可见合并后`dev`添加的6个png已添加至`master`。  
+合并后可删除已不需要的分支，  
+可使用`git branch -d <branch>`删除本地分支`<branch>`，  
+可使用`git push -d <repository> <refspec>`删除远程库`<repository>`的分支`<refspec>`。
+最后把本地分支`master`推送至远程分支`master`。
+```
+$ pwd
+/home/jason/Repository/study-notes-of-git
+$ git checkout master
+$ git branch 
+  dev
+* master
+$ git merge dev
+更新 c97e35d..8334be5
+Fast-forward
+ add-a-remote-repository-1.png      | Bin 0 -> 108514 bytes
+ add-a-remote-repository-2.png      | Bin 0 -> 90494 bytes
+ add-a-remote-repository-3.png      | Bin 0 -> 115194 bytes
+ add-a-remote-repository-4.png      | Bin 0 -> 148032 bytes
+ add-a-remote-repository-5.png      | Bin 0 -> 95923 bytes
+ clone-from-a-remote-repository.png | Bin 0 -> 108320 bytes
+ git-tutorial-by-liaoxuefeng.md     | 164 ++++++++++++++++++++++++++++++++++---
+ 7 files changed, 153 insertions(+), 11 deletions(-)
+ create mode 100644 add-a-remote-repository-1.png
+ create mode 100644 add-a-remote-repository-2.png
+ create mode 100644 add-a-remote-repository-3.png
+ create mode 100644 add-a-remote-repository-4.png
+ create mode 100644 add-a-remote-repository-5.png
+ create mode 100644 clone-from-a-remote-repository.png
+ $ git branch -d dev
+已删除分支 dev（曾为 8334be5）。
+ $ git push -d origin dev
+To github.com:jason-ding13/study-notes-of-git.git
+ - [deleted]         dev
+ $ git push 
+对象计数中: 8, 完成.
+Delta compression using up to 4 threads.
+压缩对象中: 100% (8/8), 完成.
+写入对象中: 100% (8/8), 603.02 KiB | 3.06 MiB/s, 完成.
+Total 8 (delta 0), reused 0 (delta 0)
+To github.com:jason-ding13/study-notes-of-git.git
+   c97e35d..b9c46b9  master -> master
+```
+
+通过远程分支可见本地合并分支成功！同时，远程分支`dev`已删除。
+
+nofeature![merge-branch-into-current-HEAD.png](./merge-branch-into-current-HEAD.png)
 

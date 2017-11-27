@@ -1,5 +1,6 @@
 # git tutorial 
 ![git](./git.jpeg) 
+
 这是来自廖雪峰的官方网站的git教程的学习笔记。  
 据说是史上最浅显易懂的Git教程！
 
@@ -91,7 +92,7 @@ $ git add txt_1.txt
 $ pwd
 /home/jason/Repository/hello-world
 $ git commit -m 'wrote a txt file txt_1.txt'
- [master（根提交） bd9fb3c] wrote a txt file txt_1.txt
+[master（根提交） bd9fb3c] wrote a txt file txt_1.txt
  Committer: jason <jason@Jason.PC>
 您的姓名和邮件地址基于登录名和主机名进行了自动设置。请检查它们正确
 与否。您可以对其进行设置以免再出现本提示信息：
@@ -121,7 +122,7 @@ $ git commit -m 'wrote a txt file txt_1.txt'
 $ pwd
 /home/jason/Repository/hello-world
 $ git commit --amend --reset-author -m 'wrote a txt file txt_1.txt and reset anthor'
- [master d78f63a] wrote a txt file txt_1.txt and reset anthor
+[master d78f63a] wrote a txt file txt_1.txt and reset anthor
  1 file changed, 1 insertion(+)
  create mode 100644 txt_1.txt
 ```
@@ -134,7 +135,7 @@ $ pwd
 /home/jason/Repository/hello-world
 $ git add txt_2.txt txt_3.txt
 $ git commit -m 'add two files: txt_2.txt, txt_3.txt'
- [master 8c7be40] add two files: txt_2.txt, txt_3.txt
+[master 8c7be40] add two files: txt_2.txt, txt_3.txt
  2 files changed, 2 insertions(+)
  create mode 100644 txt_2.txt
  create mode 100644 txt_3.txt
@@ -214,7 +215,7 @@ $ git diff
 $ pwd
 /home/jason/Repository/hello-world
 $ git commit -m 'modify txt_1'
- [master 5cf1eba] modify txt_1
+[master 5cf1eba] modify txt_1
  1 file changed, 1 insertion(+), 1 deletion(-)
 $ git status
 位于分支 master
@@ -234,7 +235,7 @@ $ pwd
 /home/jason/Repository/hello-world
 $ git add txt_1.txt 
 $ git commit -m 'modify txt_1 again'
- [master 1659240] modify txt_1 again
+[master 1659240] modify txt_1 again
  1 file changed, 1 insertion(+), 1 deletion(-)
 ```
 
@@ -424,7 +425,7 @@ $ git status
 $ pwd
 /home/jason/Repository/hello-world
 $ git commit -m 'modify txt_2 and wrote txt_4'
- [master 66fe425] modify txt_2 and wrote txt_4
+[master 66fe425] modify txt_2 and wrote txt_4
  2 files changed, 2 insertions(+), 1 deletion(-)
  create mode 100644 txt_4.txt
 $ git status
@@ -577,14 +578,14 @@ $ git status
 
 	删除：     txt_4.txt
 $ git commit -m 'delete txt_4.txt'
- [master 2daa693] delete txt_4.txt
+[master 2daa693] delete txt_4.txt
  1 file changed, 1 deletion(-)
  delete mode 100644 txt_4.txt
 ```
 
 首先使用`git reset <commit>`与`git checkout -- <paths>`还原`txt_4.txt`。  
 然后直接使用`git rm <file>`添加删除至暂存区。  
-直接使用`git rm <file>`实际与组合使用`rm [file]`与`git rm <file>`没有区别。  
+直接使用`git rm <file>`实际与组合使用`rm <file>`与`git rm <file>`没有区别。  
 考虑到工作区、暂存区、当前版本的关系，个人建议采取第一种方式删除文件。
 ```
 $ pwd
@@ -603,11 +604,10 @@ $ 位于分支 master
 要提交的变更：
   （使用 "git reset HEAD <文件>..." 以取消暂存）
 $ git commmit -m 'delete txt_4.txt'
- [master dda03d5] delete txt_4.txt
+[master dda03d5] delete txt_4.txt
  1 file changed, 1 deletion(-)
  delete mode 100644 txt_4.txt
 ```
-
 ## 远程仓库
 本地git仓库和远程[github](https://github.com)仓库之间的传输是可以通过SSH加密的。  
 首先根据github官方的引导[checking-for-existing-ssh-keys](https://help.github.com/articles/checking-for-existing-ssh-keys)使用`ls -al ~/.ssh`检查是否已存在**SSH key**  。  
@@ -687,10 +687,152 @@ $ cat ~/.ssh/id_rsa.pub
 
 ![adding-a-new-ssh-key-to-your-github-account-1.png](./adding-a-new-ssh-key-to-your-github-account-1.png)
 
-在`key`输入框中粘贴`id_rsa.pub`的内容，点击按钮`Add SSH key`。
+在`Key`输入框中粘贴`id_rsa.pub`的内容，点击按钮`Add SSH key`。
 
 ![adding-a-new-ssh-key-to-your-github-account-2.png](./adding-a-new-ssh-key-to-your-github-account-2.png)
 
 添加成功！
 
 ![adding-a-new-ssh-key-to-your-github-account-3.png](./adding-a-new-ssh-key-to-your-github-account-3.png)
+
+### 添加远程库
+打开[github](https://github.com)的页面，点击按钮`New repository`创建远程版本库。
+
+![add-a-remote-repository-1.png](./add-a-remote-repository-1.png)
+
+输入版本库名称，直接点击按钮`Create repository`。
+
+![add-a-remote-repository-2.png](./add-a-remote-repository-2.png)
+
+创建成功！（注意创建的版本库）
+
+![add-a-remote-repository-3.png](./add-a-remote-repository-3.png)
+
+根据提示在本地使用命令行：
+> **...or create a new repository on the command line**
+>	echo "# study-notes-of-git" >> README.md
+>	git init
+>	git add README.md
+>  git commit -m "first commit"
+> git remote add origin git@github.com:jason-ding13/study-notes-of-git.git
+> git push -u origin master
+
+首先创建目录`study-notes-of-git`和文件`README.md`并初始化本地版本库。  
+然后使用`git remote add <name> <url>`添加远程库，  
+其中`origin`是git对远程库的默认命名。  
+```
+$ pwd
+/home/jason/Repository
+$ mkdir study-notes-of-git
+$ cd study-notes-of-git
+$ echo "# study-notes-of-git" >> README.md
+$ git init
+已初始化空的 Git 仓库于 /home/jason/Repository/study-notes-of-git/.git/
+$ git add README.md
+$ git commit -m 'first commit and add markdown of README'
+[master（根提交） 66a7ef7] first commit and add markdown of README
+ 1 file changed, 1 insertion(+)
+ create mode 100644 README.md
+$ git remote add origin git@github.com:jason-ding13/study-notes-of-git.git
+```
+
+最后使用`git push -u <repository> <refspec>...`
+把修改提交推送至远程库`<repository>`的`<refspec>`分支。  
+其中`[-u]`是指完成推送的同时，关联本地库当前所在分支和远程库`<repository>`的`<refspec>`分支。  
+在已关联远程库分支的本地库分支上使用`git push`或`git pull`时不需要指定`<repository>`和`<refspec>`。  
+第一次使用`SSH key`链接至将要求确认是否为github官方服务器的指纹，确认输入`yes`。  
+> Are you sure you want to continue connecting (yes/no)? 
+
+此外，[github官方服务器的指纹](https://help.github.com/articles/github-s-ssh-key-fingerprints/)可在github官网查找。
+```
+$git push -u origin master
+The authenticity of host 'github.com (***.***.***.***)' can't be established.
+RSA key fingerprint is SHA256:**************************************************.
+RSA key fingerprint is MD5:**:**:**:**:**:**:**:**:**:**:**:**:**:**:**:**.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added 'github.com,***.***.***.***' (RSA) to the list of known hosts.
+对象计数中: 3, 完成.
+写入对象中: 100% (3/3), 248 bytes | 248.00 KiB/s, 完成.
+Total 3 (delta 0), reused 0 (delta 0)
+To github.com:jason-ding13/study-notes-of-git.git
+ * [new branch]      master -> master
+分支 master 设置为跟踪来自 origin 的远程分支 master。
+```
+
+把目前关于学习git的相关文件复制至`study-notes-of-git`目录下，包含5个文件：3个png，1个jpeg，1个markdown。  
+再按照添加修改，提交修改，推送至远程库的顺序执行。  
+其中，由于本地`master`已关联远程分支`matser`，直接使用`git push`推送。
+```
+$ pwd
+/home/jason/Repository/study-notes-of-git
+$ ls
+adding-a-new-ssh-key-to-your-github-account-1.png
+adding-a-new-ssh-key-to-your-github-account-2.png
+adding-a-new-ssh-key-to-your-github-account-3.png
+git.jpeg
+git-tutorial-by-liaoxuefeng.md
+README.md
+$ git add adding-a-new-ssh-key-to-your-github-account-*.png git.jpeg git-tutorial-by-liaoxuefeng.md 
+git commit -m 'add png of adding-a-new-ssh-key-to-your-github-account, jpeg of git, markdown of git-tutorial-by-liaoxuefeng'
+[master c97e35d] add png of adding-a-new-ssh-key-to-your-github-account, jpeg of git, markdown of git-tutorial-by-liaoxuefeng
+ Date: Thu Nov 23 17:30:04 2017 +0800
+ 5 files changed, 696 insertions(+)
+ create mode 100644 adding-a-new-ssh-key-to-your-github-account-1.png
+ create mode 100644 adding-a-new-ssh-key-to-your-github-account-2.png
+ create mode 100644 adding-a-new-ssh-key-to-your-github-account-3.png
+ create mode 100644 git-tutorial-by-liaoxuefeng.md
+ create mode 100644 git.jpeg
+ $ git push
+ 对象计数中: 7, 完成.
+Delta compression using up to 4 threads.
+压缩对象中: 100% (7/7), 完成.
+写入对象中: 100% (7/7), 862.90 KiB | 3.90 MiB/s, 完成.
+Total 7 (delta 0), reused 0 (delta 0)
+To github.com:jason-ding13/study-notes-of-git.git
+   66a7ef7..c97e35d  master -> master
+```
+
+推送成功！
+
+![add-a-remote-repository-4.png](./add-a-remote-repository-4.png)
+
+点击按钮`commit`，可见关于每一次提交的说明与本地库的一致。
+
+![add-a-remote-repository-5.png](./add-a-remote-repository-5.png)
+
+### 从远程库克隆
+打开[github](https://github.com)的页面，点击按钮`New repository`创建远程库`hello-world`。  
+个人所创建的远程库`hello-world`包含3个文件：.gitgnore，README.md，hello-world.py。
+使用`git clone <repository>`克隆远程库，  
+但是由于已存在`hello-world`的非空目录，克隆失败。
+```
+$ pwd
+/home/jason/Repository
+$ ls
+hello-world  study-notes-of-git
+$ git clone git@github.com:jason-ding13/hello-world.git
+fatal: 目标路径 'hello-world' 已经存在，并且不是一个空目录。
+```
+
+删除本地`hello-world`目录，重新创建`hello-world`的空目录。  
+使用`git clone <repository>`克隆远程库，克隆成功！  
+注意对应远程库的空目录不要求已存在，即使未创建空目录，也可以进行克隆。
+```
+$ pwd
+/home/jason/Repository
+$ rm -fr hello-world
+$ ls
+$ study-notes-of-git
+$ mkdir hello-world
+$ git clone git@github.com:jason-ding13/hello-world.git
+正克隆到 'hello-world'...
+remote: Counting objects: 19, done.
+remote: Compressing objects: 100% (10/10), done.
+remote: Total 19 (delta 3), reused 0 (delta 0), pack-reused 7
+接收对象中: 100% (19/19), 完成.
+处理 delta 中: 100% (4/4), 完成.
+$ cd hello-world
+$ ls -ah
+.  ..  .git  .gitignore  hello-world.py  README.md
+```
+

@@ -9,7 +9,7 @@
 2. 版本库
 3. 版本控制
 4. 远程仓库
-5. 分支管理
+5. 分支管
 
 ## git简介
 git是分布式版本控制系统。
@@ -964,4 +964,296 @@ To github.com:jason-ding13/study-notes-of-git.git
 通过远程分支可见本地合并分支成功！同时，远程分支`dev`已删除。
 
 ![merge-branch-into-current-HEAD.png](./merge-branch-into-current-HEAD.png)
+
+### 解决冲突
+在实际情况中，合并分支不一定如此顺利，甚至存在冲突。  
+仿照原文的例子，把目前需添加的关于学习git的相关文件复制至`study-notes-of-git`目录下，包含2个png，1个已更新的markdown。  
+创建`feature1`分支，切换至`feature1`分支完成3个文件的添加与提交。
+```
+$ pwd
+/home/jason/Repository/study-notes-of-git
+$ git branch feature1
+$ git checkout feature1
+$ git status
+位于分支 feature1
+尚未暂存以备提交的变更：
+  （使用 "git add <文件>..." 更新要提交的内容）
+  （使用 "git checkout -- <文件>..." 丢弃工作区的改动）
+
+	修改：     git-tutorial-by-liaoxuefeng.md
+
+未跟踪的文件:
+  （使用 "git add <文件>..." 以包含要提交的内容）
+
+	create-a-new-branch.png
+	merge-branch-into-current-HEAD.png
+
+修改尚未加入提交（使用 "git add" 和/或 "git commit -a"）
+$ git add create-a-new-branch.png merge-branch-into-current-HEAD.png git-tutorial-by-liaoxuefeng.md
+$ git commit -m 'add png of create-a-new-branch, png of merge-branch-into-current-HEAD, modify markdown of git-tutorial-by-liaoxuefeng.md(更新分支管理部分，未全部完成).'
+[feature1 391fd20] add png of create-a-new-branch, png of merge-branch-into-current-HEAD, modify markdown of git-tutorial-by-liaoxuefeng.md(更新分支管理部分，未全部完成).
+ 3 files changed, 129 insertions(+)
+ create mode 100644 create-a-new-branch.png
+ create mode 100644 merge-branch-into-current-HEAD.png
+```
+
+再次切换至`mater`分支。  
+可见版本已回退，目录未存在`create-a-new-branch.png`与`merge-branch-into-current-HEAD.png`文件。
+```
+$ pwd
+/home/jason/Repository/study-notes-of-git
+$ git checkout master
+切换到分支 'master'
+您的分支与上游分支 'origin/master' 一致。
+$ ls
+add-a-remote-repository-1.png
+add-a-remote-repository-2.png
+add-a-remote-repository-3.png
+add-a-remote-repository-4.png
+add-a-remote-repository-5.png
+adding-a-new-ssh-key-to-your-github-account-1.png
+adding-a-new-ssh-key-to-your-github-account-2.png
+adding-a-new-ssh-key-to-your-github-account-3.png
+clone-from-a-remote-repository.png
+git.jpeg
+git-tutorial-by-liaoxuefeng.md
+README.md
+```
+
+对刚在`feature1`分支添加提交的关于学习git的markdown复制至`study-notes-of-git`目录下，并且在倒数第二行开始处插入文本`nofeature`（文件最后一行为空行）。  
+最后在`master`分支添加提交修改后的`git-tutorial-by-liaoxuefeng.md`。  
+注意，仅添加提交`git-tutorial-by-liaoxuefeng.md`。  
+```
+$ pwd
+/home/jason/Repository/study-notes-of-git
+$ cat git-tutorial-by-liaoxuefeng.md | tail -n 2
+nofeature![merge-branch-into-current-HEAD.png](./merge-branch-into-current-HEAD.png)
+
+$ git status
+位于分支 master
+您的分支与上游分支 'origin/master' 一致。
+尚未暂存以备提交的变更：
+  （使用 "git add <文件>..." 更新要提交的内容）
+  （使用 "git checkout -- <文件>..." 丢弃工作区的改动）
+
+	修改：     git-tutorial-by-liaoxuefeng.md
+
+修改尚未加入提交（使用 "git add" 和/或 "git commit -a"）
+$ git add git-tutorial-by-liaoxuefeng.md
+$ git commit -m 'modify markdown of git-tutorial-by-liaoxuefeng.md(更新分支管理部分，未全部完成).'
+[master bb58574] modify markdown of git-tutorial-by-liaoxuefeng.md(更新分支管理部分，未全部完成).
+ 1 file changed, 129 insertions(+)
+```
+
+于是成功仿造类似原文的例子：
+
+* `feature1`分支比`master`分支多2个文件
+*  `git-tutorial-by-liaoxuefeng.md`在`feature1`分支上和在`master`分支上存在冲突
+
+![resolve-the-merge-conflict-1.png](./resolve-the-merge-conflict-1.png)
+
+尝试使用`git merge <branch>`合并`feature1`与`master`，显示自动合并失败，要求修正冲突后再次提交。  
+使用`git status`可见：
+
+* `feature1`分支多出的2个文件可通过合并分支添加至暂存区。
+* `git-tutorial-by-liaoxuefeng.md`存在冲突未通过合并。
+
+还可使用`git diff`查看具体冲突。
+```
+$ pwd
+/home/jason/Repository/study-notes-of-git
+$ git branch
+  feature1
+* master
+$ git merge feature1 
+自动合并 git-tutorial-by-liaoxuefeng.md
+冲突（内容）：合并冲突于 git-tutorial-by-liaoxuefeng.md
+自动合并失败，修正冲突然后提交修正的结果。
+$ git status
+位于分支 master
+您的分支领先 'origin/master' 共 1 个提交。
+  （使用 "git push" 来发布您的本地提交）
+您有尚未合并的路径。
+  （解决冲突并运行 "git commit"）
+  （使用 "git merge --abort" 终止合并）
+
+要提交的变更：
+
+	新文件：   create-a-new-branch.png
+	新文件：   merge-branch-into-current-HEAD.png
+
+未合并的路径：
+  （使用 "git add <文件>..." 标记解决方案）
+
+	双方修改：   git-tutorial-by-liaoxuefeng.md
+$ git diff
+diff --cc git-tutorial-by-liaoxuefeng.md
+index 2daa288,991fd88..0000000
+--- a/git-tutorial-by-liaoxuefeng.md
++++ b/git-tutorial-by-liaoxuefeng.md
+@@@ -963,5 -963,5 +963,9 @@@ To github.com:jason-ding13/study-notes-
+  
+  通过远程分支可见本地合并分支成功！同时，远程分支`dev`已删除。
+  
+++<<<<<<< HEAD
+ +nofeature![merge-branch-into-current-HEAD.png](./merge-branch-into-current-HEAD.png)
+++=======
++ ![merge-branch-into-current-HEAD.png](./merge-branch-into-current-HEAD.png)
+++>>>>>>> feature1
+```
+
+除了使用`git diff`可常看具体冲突外，`git-tutorial-by-liaoxuefeng.md`文件本身也标记了冲突。
+```
+$ pwd
+/home/jason/Repository/study-notes-of-git
+$ cat git-tutorial-by-liaoxuefeng.md | tail -n 6
+<<<<<<< HEAD
+nofeature![merge-branch-into-current-HEAD.png](./merge-branch-into-current-HEAD.png)
+=======
+![merge-branch-into-current-HEAD.png](./merge-branch-into-current-HEAD.png)
+>>>>>>> feature1
+
+```
+
+对`git-tutorial-by-liaoxuefeng.md`倒数两行修改为：（文件最后一为空行）
+```
+通过远程分支可见本地合并分支成功！同时，远程分支`dev`已删除。
+
+![merge-branch-into-current-HEAD.png](./merge-branch-into-current-HEAD.png)
+
+```
+
+再次添加提交修改后的`git-tutorial-by-liaoxuefeng.md`。  
+```
+$ pwd
+/home/jason/Repository/study-notes-of-git
+$ git add git-tutorial-by-liaoxuefeng.md 
+$ git status
+位于分支 master
+您的分支领先 'origin/master' 共 1 个提交。
+  （使用 "git push" 来发布您的本地提交）
+所有冲突已解决但您仍处于合并中。
+  （使用 "git commit" 结束合并）
+
+要提交的变更：
+
+	新文件：   create-a-new-branch.png
+	修改：     git-tutorial-by-liaoxuefeng.md
+	新文件：   merge-branch-into-current-HEAD.png
+$ git commit -m 'merge feature1 into master, resolve the merge conflict of git-tutorial-by-liaoxuefeng.md'
+[master 6b87ce8] merge feature1 into master, resolve the merge conflict of git-tutorial-by-liaoxuefeng.md
+```
+
+成功解决冲突并合并分支！
+
+![resolve-the-merge-conflict-2.png](resolve-the-merge-conflict-2.png)
+
+使用`git log --graph`可以查看提交的历史简图，进一步了解分支合并的情况。
+```
+$ git log --graph --pretty=oneline --abbrev-commit 
+*   6b87ce8 (HEAD -> master) merge feature1 into master, resolve the merge conflict of git-tutorial-by-liaoxuefeng.md
+|\  
+| * 391fd20 (feature1) add png of create-a-new-branch, png of merge-branch-into-current-HEAD, modify markdown of git-tutorial-by-liaoxuefeng.md(更新分支管理部分，未全部完成).
+* | bb58574 modify markdown of git-tutorial-by-liaoxuefeng.md(更新分支管理部分，未全部完成).
+|/  
+* 8334be5 add png of add-a-remote-repository, png of clone-from-a-remote-repository, modify markdown of git-tutorial-by-liaoxuefeng(更新远程仓库部分).
+* c97e35d add png of adding-a-new-ssh-key-to-your-github-account, jpeg of git, markdown of git-tutorial-by-liaoxuefeng
+* 66a7ef7 first commit and add markdown of README
+```
+
+最后删除本地`feature1`分支，推送远程`master`分支。
+```
+$ git branch -d feature1 
+已删除分支 feature1（曾为 391fd20）。
+$ git push
+对象计数中: 9, 完成.
+Delta compression using up to 4 threads.
+压缩对象中: 100% (9/9), 完成.
+写入对象中: 100% (9/9), 310.03 KiB | 1.63 MiB/s, 完成.
+Total 9 (delta 5), reused 0 (delta 0)
+remote: Resolving deltas: 100% (5/5), completed with 2 local objects.
+To github.com:jason-ding13/study-notes-of-git.git
+ + 75bf61d...6b87ce8 master -> master (forced update)
+```
+
+### 分支管理策略
+至此，`study-notes-of-git`已经合并过2次分支了，`dev`与`feature1`。  
+但是如上关于历史提交的简图只记录1次的分支合并。  
+这是由于合并`dev`分支时采用的是`Fast-forward`模式。  
+在`Fast-forward`模式下，删除分支将丢失分支信息。
+> $ git merge dev
+更新 c97e35d..8334be5
+Fast-forward
+
+为保留全部分支信息，可使用`git merge --no-ff <branch>`进行合并分支。  
+此时将不采用`Fast-forward`模式。  
+把目前需添加的关于学习git的相关文件复制至`study-notes-of-git`目录下，包含2个png。  
+再次创建并切换`dev`分支，完成新分支对2个png的提交。
+```
+$ git branch dev
+$ git checkout dev
+$ git status
+位于分支 dev
+未跟踪的文件:
+  （使用 "git add <文件>..." 以包含要提交的内容）
+
+	resolve-the-merge-conflict-1.png
+	resolve-the-merge-conflict-2.png
+
+提交为空，但是存在尚未跟踪的文件（使用 "git add" 建立跟踪）
+$ git add resolve-the-merge-conflict-*.png
+$ git commit -m 'add png of resolve-the-merge-conflict'
+[dev c8c0266] add png of resolve-the-merge-conflict
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 resolve-the-merge-conflict-1.png
+ create mode 100644 resolve-the-merge-conflict-2.png
+```
+
+切换至`master`分支，使用`git merge --no-ff <branch>`合并分支。  
+最后推送远程`master`分支并删除本地`dev`分支。  
+使用`git log --graph`查看历史提交的简图，已删除的本地`dev`分支信息已保留。
+```
+$ git checkout master 
+切换到分支 'master'
+您的分支与上游分支 'origin/master' 一致。
+$ git merge --no-ff dev
+Merge made by the 'recursive' strategy.
+ resolve-the-merge-conflict-1.png | Bin 0 -> 4222 bytes
+ resolve-the-merge-conflict-2.png | Bin 0 -> 4801 bytes
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 resolve-the-merge-conflict-1.png
+ create mode 100644 resolve-the-merge-conflict-2.png
+$ git branch -d dev 
+已删除分支 dev（曾为 c8c0266）。
+$ git log --graph --pretty=oneline --abbrev-commit 
+*   7dceab6 (HEAD -> master) Merge branch 'dev'
+|\  
+| * c8c0266 add png of resolve-the-merge-conflict
+|/  
+*   6b87ce8 (origin/master) merge feature1 into master, resolve the merge conflict of git-tutorial-by-liaoxuefeng.md
+|\  
+| * 391fd20 add png of create-a-new-branch, png of merge-branch-into-current-HEAD, modify markdown of git-tutorial-by-liaoxuefeng.md(更新分支管理部分，未全部完成).
+* | bb58574 modify markdown of git-tutorial-by-liaoxuefeng.md(更新分支管理部分，未全部完成).
+|/  
+* 8334be5 add png of add-a-remote-repository, png of clone-from-a-remote-repository, modify markdown of git-tutorial-by-liaoxuefeng(更新远程仓库部分).
+* c97e35d add png of adding-a-new-ssh-key-to-your-github-account, jpeg of git, markdown of git-tutorial-by-liaoxuefeng
+* 66a7ef7 first commit and add markdown of README
+$ git push
+对象计数中: 5, 完成.
+Delta compression using up to 4 threads.
+压缩对象中: 100% (5/5), 完成.
+写入对象中: 100% (5/5), 9.10 KiB | 4.55 MiB/s, 完成.
+Total 5 (delta 2), reused 0 (delta 0)
+remote: Resolving deltas: 100% (2/2), completed with 1 local object.
+To github.com:jason-ding13/study-notes-of-git.git
+   6b87ce8..7dceab6  master -> master
+```
+
+再引用原文对分支策略的描述：
+> 在实际开发中，我们应该按照几个基本原则进行分支管理：
+首先，`master`分支应该是非常稳定的，也就是仅用来发布新版本，平时不能在上面干活；
+那在哪干活呢？干活都在`dev`分支上，也就是说，`dev`分支是不稳定的，到某个时候，比如1.0版本发布时，再把`dev`分支合并到`master`上，在`master`分支发布1.0版本；
+你和你的小伙伴们每个人都在`dev`分支上干活，每个人都有自己的分支，时不时地往`dev`分支上合并就可以了。
+所以，团队合作的分支看起来就像这样：
+![branch-management-strategy.png](./branch-management-strategy.png)
 

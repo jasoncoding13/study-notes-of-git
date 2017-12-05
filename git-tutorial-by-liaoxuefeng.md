@@ -9,7 +9,10 @@
 2. 版本库
 3. 版本控制
 4. 远程仓库
-5. 分支管
+5. 分支管理
+6. 标签管理
+7. 自定义git
+8. 总结
 
 ## git简介
 git是分布式版本控制系统。
@@ -737,7 +740,7 @@ $ git commit -m 'first commit and add markdown of README'
 $ git remote add origin git@github.com:jason-ding13/study-notes-of-git.git
 ```
 
-最后使用`git push -u <repository> <refspec>...`
+最后使用`git push -u <repository> <refspec>`
 把修改提交推送至远程库`<repository>`的`<refspec>`分支。  
 其中`[-u]`是指完成推送的同时，关联本地库当前所在分支和远程库`<repository>`的`<refspec>`分支。  
 在已关联远程库分支的本地库分支上使用`git push`或`git pull`时不需要指定`<repository>`和`<refspec>`。  
@@ -968,7 +971,8 @@ To github.com:jason-ding13/study-notes-of-git.git
 ### 解决冲突
 在实际情况中，合并分支不一定如此顺利，甚至存在冲突。  
 仿照原文的例子，把目前需添加的关于学习git的相关文件复制至`study-notes-of-git`目录下，包含2个png，1个已更新的markdown。  
-创建`feature1`分支，切换至`feature1`分支完成3个文件的添加与提交。
+创建`feature1`分支，切换至`feature1`分支完成3个文件的添加与提交。  
+注意原则上应先切换分支后再修改工作区。
 ```
 $ pwd
 /home/jason/Repository/study-notes-of-git
@@ -1048,7 +1052,7 @@ $ git commit -m 'modify markdown of git-tutorial-by-liaoxuefeng.md(更新分支�
 于是成功仿造类似原文的例子：
 
 * `feature1`分支比`master`分支多2个文件
-*  `git-tutorial-by-liaoxuefeng.md`在`feature1`分支上和在`master`分支上存在冲突
+* `git-tutorial-by-liaoxuefeng.md`在`feature1`分支上和在`master`分支上存在冲突
 
 ![resolve-the-merge-conflict-1.png](./resolve-the-merge-conflict-1.png)
 
@@ -1150,6 +1154,8 @@ $ git commit -m 'merge feature1 into master, resolve the merge conflict of git-t
 
 使用`git log --graph`可以查看提交的历史简图，进一步了解分支合并的情况。
 ```
+$ pwd
+/home/jason/Repository/study-notes-of-git
 $ git log --graph --pretty=oneline --abbrev-commit 
 *   6b87ce8 (HEAD -> master) merge feature1 into master, resolve the merge conflict of git-tutorial-by-liaoxuefeng.md
 |\  
@@ -1163,6 +1169,8 @@ $ git log --graph --pretty=oneline --abbrev-commit
 
 最后删除本地`feature1`分支，推送远程`master`分支。
 ```
+$ pwd
+/home/jason/Repository/study-notes-of-git
 $ git branch -d feature1 
 已删除分支 feature1（曾为 391fd20）。
 $ git push
@@ -1190,6 +1198,8 @@ Fast-forward
 把目前需添加的关于学习git的相关文件复制至`study-notes-of-git`目录下，包含2个png。  
 再次创建并切换`dev`分支，完成新分支对2个png的提交。
 ```
+$ pwd
+/home/jason/Repository/study-notes-of-git
 $ git branch dev
 $ git checkout dev
 $ git status
@@ -1213,6 +1223,8 @@ $ git commit -m 'add png of resolve-the-merge-conflict'
 最后推送远程`master`分支并删除本地`dev`分支。  
 使用`git log --graph`查看历史提交的简图，已删除的本地`dev`分支信息已保留。
 ```
+$ pwd
+/home/jason/Repository/study-notes-of-git
 $ git checkout master 
 切换到分支 'master'
 您的分支与上游分支 'origin/master' 一致。
@@ -1257,3 +1269,113 @@ To github.com:jason-ding13/study-notes-of-git.git
 所以，团队合作的分支看起来就像这样：
 ![branch-management-strategy.png](./branch-management-strategy.png)
 
+### BUG分支
+针对BUG的修复，通常创建一个新分支（如`bug-###`），在新分支上完成修复再合并至个人本地开发分支。  
+但是当切换分支后，工作区将回退，则原来未提交的修改将丢失。  
+如果原来的工作区已修改，但进度不足以提交，就可使用`git stash`临时保存工作区的修改。  
+首先把目前需添加的关于学习git的1个已更新的markdown复制至`study-notes-of-git`目录下。  
+不添加提交，临时保存工作区。
+```
+$ pwd
+/home/jason/Repository/study-notes-of-git
+$ git status
+位于分支 master
+您的分支与上游分支 'origin/master' 一致。
+尚未暂存以备提交的变更：
+  （使用 "git add <文件>..." 更新要提交的内容）
+  （使用 "git checkout -- <文件>..." 丢弃工作区的改动）
+
+	修改：     git-tutorial-by-liaoxuefeng.md
+
+修改尚未加入提交（使用 "git add" 和/或 "git commit -a"）
+$ git stash
+保存工作目录和索引状态 WIP on master: 7dceab6 Merge branch 'dev'
+$ git status
+位于分支 master
+您的分支与上游分支 'origin/master' 一致。
+无文件要提交，干净的工作区
+```
+
+然后把目前需添加的关于学习git的1个png复制至`study-notes-of-git`目录下，模拟修复BUG。
+创建切换至`bug`分支，逐步完成添加修改、提交修改、合并分支等。
+注意原则上应切换分支后再修改工作区。
+```
+$ pwd
+/home/jason/Repository/study-notes-of-git
+$ git branch bug
+$ git checkout bug
+切换到分支 'bug'
+$ git add branch-management-strategy.png 
+$ git commit -m 'add png of branch-management-strategy'
+[bug cd20098] add png of branch-management-strategy
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 branch-management-strategy.png
+$ git checkout master 
+切换到分支 'master'
+您的分支与上游分支 'origin/master' 一致。
+$ git merge --no-ff bug
+Merge made by the 'recursive' strategy.
+ branch-management-strategy.png | Bin 0 -> 4441 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 branch-management-strategy.png
+$ git branch -d bug
+已删除分支 bug（曾为 cd20098）。
+```
+
+再使用`git stash list`查看已保存的临时工作区，  
+使用`git apply <stash>`还原工作区，完成提交与推送。
+```
+$ pwd
+/home/jason/Repository/study-notes-of-git
+$ git stash list 
+stash@{0}: WIP on master: 7dceab6 Merge branch 'dev'
+$ git stash apply stash@{0}
+位于分支 master
+您的分支领先 'origin/master' 共 2 个提交。
+  （使用 "git push" 来发布您的本地提交）
+尚未暂存以备提交的变更：
+  （使用 "git add <文件>..." 更新要提交的内容）
+  （使用 "git checkout -- <文件>..." 丢弃工作区的改动）
+
+	修改：     git-tutorial-by-liaoxuefeng.md
+
+修改尚未加入提交（使用 "git add" 和/或 "git commit -a"）
+$ git add git-tutorial-by-liaoxuefeng.md 
+$ git commit -m 'modify markdown of git-tutorial-by-liaoxufeng(更新至分支管理的解决冲突部分)'
+[master 2bf5821] modify markdown of git-tutorial-by-liaoxufeng(更新至分支管理的解决冲突部分)
+ 1 file changed, 293 insertions(+), 1 deletion(-)
+$ git push
+对象计数中: 7, 完成.
+Delta compression using up to 4 threads.
+压缩对象中: 100% (7/7), 完成.
+写入对象中: 100% (7/7), 8.19 KiB | 1.36 MiB/s, 完成.
+Total 7 (delta 4), reused 0 (delta 0)
+remote: Resolving deltas: 100% (4/4), completed with 2 local objects.
+To github.com:jason-ding13/study-notes-of-git.git
+   7dceab6..2bf5821  master -> master
+```
+
+对于可删除的临时工作区应使用`git stash drop <stash>`及时清理。
+```
+$ git stash drop stash@{0}
+丢弃了 stash@{0} (f0be260c6e462dd9894596c93e22ec4b41fe2819)
+$ git stash list
+```
+
+### 多人协作
+
+## 标签管理
+
+### 创建标签
+
+### 管理标签
+
+## 自定义git
+
+### 忽略特殊文件
+ 
+### 配置别名
+ 
+### 搭建git服务器
+
+## 总结

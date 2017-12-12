@@ -1363,19 +1363,305 @@ $ git stash list
 ```
 
 ### 多人协作
+引用并修改原文对多人协作的工作模式的描述：
+> 首先，可以试图用`git push <repository> <refspec>`推送自己的修改；
+如果推送失败，则因为远程分支比你的本地更新，需要先用`git pull`试图合并；
+如果合并有冲突，则解决冲突，并在本地提交；
+没有冲突或者解决掉冲突后，再用`git push <repository> <refspec>`推送就能成功！
+如果`git pull`提示“当前分支没有跟踪信息。”，则说明本地分支和远程分支的链接关系没有创建，用命令`git branch --set-upstream-to=<upstream> <branchname>`。
+
+首先创建本地分支`dev`，关联并推送远程分支`dev`分支。 
+```
+$ pwd
+/home/jason/Repository/study-notes-of-git
+$ git branch dev
+$ git checkout dev
+切换到分支 'dev'
+$ git push -u origin dev
+Total 0 (delta 0), reused 0 (delta 0)
+To github.com:jason-ding13/study-notes-of-git.git
+ * [new branch]      dev -> dev
+分支 dev 设置为跟踪来自 origin 的远程分支 dev。
+```
+
+仿照原文模拟多人协作，在其它目录新建一个空目录`study-notes-of-git`（不新建也可以，但与上文的`study-notes-of-git`的目录是不同的）。  
+克隆远程库到新建的空目录，将默认关联本地`master`与远程`master`。  
+可使用`git remote -v`查看远程库的信息与拥有的权限，  
+可见对于远程库具有`push`与`fetch`两种权限完成推送与抓取。
+```
+$ pwd
+/home/jason/Repository/other
+$ cd other
+$ mkdir study-notes-of-git
+$ git clone git@github.com:jason-ding13/study-notes-of-git.git
+$ cd study-notes-of-git
+$ git status
+位于分支 master
+您的分支与上游分支 'origin/master' 一致。
+无文件要提交，干净的工作区
+$ git remote -v
+origin	git@github.com:jason-ding13/study-notes-of-git.git (fetch)
+origin	git@github.com:jason-ding13/study-notes-of-git.git (push)
+```
+
+然后把目前需添加的关于学习git的1个已更新的markdown复制至新建的`study-notes-of-git`目录下（注意是刚才新建的本地仓库）。  
+创建并切换至`dev`，逐步完成添加，提交，推送等。  
+注意使用`git push -u <repository> <refspec>`推送同时关联本地`dev`与远程`dev`，这是由于推送前不存在`dev`分支。
+```
+$ pwd
+/home/jason/Repository/other/study-notes-of-git
+$ git branch dev
+$ git checkout dev
+切换到分支 'dev'
+$ git status
+$ git add git-tutorial-by-liaoxuefeng.md
+$ git commit -m 'modify markdown of study-notes-of-git(更新至分支管理的BUG分支部分).'
+[dev 86ecf6b] modify markdown of study-notes-of-git(更新至分支管理的BUG分支部分)
+ 1 file changed, 126 insertions(+), 4 deletions(-)
+$ git push -u origin dev
+对象计数中: 3, 完成.
+Delta compression using up to 4 threads.
+压缩对象中: 100% (3/3), 完成.
+写入对象中: 100% (3/3), 1.57 KiB | 804.00 KiB/s, 完成.
+Total 3 (delta 2), reused 0 (delta 0)
+remote: Resolving deltas: 100% (2/2), completed with 2 local objects.
+To github.com:jason-ding13/study-notes-of-git.git
+   43a06ad..86ecf6b  dev -> dev
+分支 dev 设置为跟踪来自 origin 的远程分支 dev。
+```
+
+已模拟其它本地仓库对共同的远程分支`dev`实现推送。  
+把刚才添加的关于学习git的1个已更新的markdown复至原来的本地仓库，完成本地的添加与提交，注意不完成远程分支的推送。  
+此时两个本地仓库完全一致。
+```
+$ pwd
+/home/jason/Repository/study-notes-of-git
+$ git branch 
+* dev
+  master
+$ git add git-tutorial-by-liaoxuefeng.md 
+$ git commit -m 'modify markdown of study-notes-of-git(更新至分支管理的BUG分支部分)'
+[dev b775408] modify markdown of study-notes-of-git(更新至分支管理的BUG分支部分)
+ 1 file changed, 126 insertions(+), 4 deletions(-)
+```
+
+使用`git push`推送原来本地仓库的提交，提示推送失败。  
+使用`git pull`抓取远程仓库，可理解为复制当前本地分支关联的远程分支至本地，并尝试合并本地分支与复制的远程分支。  
+使用`git status`可见由于原来本地仓库在本地分支`dev`上的提交与模拟的其它本地仓库在远程分支`dev`上推送的提交不存在冲突，合并完成。  
+其中，领先的2个提交分别是：
+
+*  原来本地仓库未推送的提交。
+*  合并本地分支与远程分支的提交。
+```
+$ git push
+To github.com:jason-ding13/study-notes-of-git.git
+ ! [rejected]        dev -> dev (fetch first)
+error: 无法推送一些引用到 'git@github.com:jason-ding13/study-notes-of-git.git'
+提示：更新被拒绝，因为远程仓库包含您本地尚不存在的提交。这通常是因为另外
+提示：一个仓库已向该引用进行了推送。再次推送前，您可能需要先整合远程变更
+提示：（如 'git pull ...'）。
+提示：详见 'git push --help' 中的 'Note about fast-forwards' 小节。
+$ git pull
+remote: Counting objects: 3, done.
+remote: Compressing objects: 100% (1/1), done.
+展开对象中: 100% (3/3), 完成.
+remote: Total 3 (delta 2), reused 3 (delta 2), pack-reused 0
+来自 github.com:jason-ding13/study-notes-of-git
+   43a06ad..86ecf6b  dev        -> origin/dev
+Merge made by the 'recursive' strategy.
+$ git status
+位于分支 dev
+您的分支领先 'origin/dev' 共 2 个提交。
+  （使用 "git push" 来发布您的本地提交）
+无文件要提交，干净的工作区
+$ git push
+对象计数中: 2, 完成.
+Delta compression using up to 4 threads.
+压缩对象中: 100% (2/2), 完成.
+写入对象中: 100% (2/2), 477 bytes | 477.00 KiB/s, 完成.
+Total 2 (delta 0), reused 0 (delta 0)
+To github.com:jason-ding13/study-notes-of-git.git
+   86ecf6b..4ea1ac3  dev -> dev
+```
+
+合并本地分支`dev`至本地分支`master`，并推送至远程分支`master`。  
+最后把远程分支`dev`删除。(注意实际中远程分支`dev`不要求删除，此处删除作用在于不失逻辑完整性。)
+```
+$ pwd
+/home/jason/Repository/study-notes-of-git
+$ git checkout master 
+切换到分支 'master'
+您的分支与上游分支 'origin/master' 一致。
+git merge dev
+更新 43a06ad..4ea1ac3
+Fast-forward
+ git-tutorial-by-liaoxuefeng.md | 130 +++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 126 insertions(+), 4 deletions(-)
+$ git push
+Total 0 (delta 0), reused 0 (delta 0)
+To github.com:jason-ding13/study-notes-of-git.git
+   43a06ad..4ea1ac3  master -> master
+$ git push origin -d dev
+To github.com:jason-ding13/study-notes-of-git.git
+ - [deleted]         dev
+```
 
 ## 标签管理
+标签在版本控制中，可以认为是指向某个提交`commit`的指针。  
+通常在`master`分支上，某些阶段性的版本提交将创建标签，如`V1.3`。  
+对于已创建标签的提交，可以方便地使用标签进行版本控制。
 
 ### 创建标签
+使用`git tag <tagname> [<commit>]`创建标签，  
+其中`[<commit>]`默认为当前提交。  
+使用`git tag`列出已创建的标签。
+```
+$ pwd
+/home/jason/Repository/study-notes-of-git
+$ git tag V0.8
+$ git tag
+V0.8
+```
+
+此外，可以使用`git tag -a <tagname> -m <msg> [<commit>]`创建无标识有注释的标签。  
+对于已创建的标签可以使用`git show <object>`展示有关标签的属性。
+```
+$ pwd 
+/home/jason/Repository/study-notes-of-git
+$ git log --pretty=oneline --abbrev-commit 
+4ea1ac3 (HEAD -> master, tag: V0.8, origin/master, dev) Merge branch 'dev' of github.com:jason-ding13/study-notes-of-git into dev
+b775408 modify markdown of study-notes-of-git(更新至分支管理的BUG分支部分)
+86ecf6b modify markdown of study-notes-of-git(更新至分支管理的BUG分支部分)
+43a06ad modify markdown of git-tutorial-by-liaoxufeng(更新至分支管理的分支管理策略部分)
+6317e2a Merge branch 'bug'
+cd20098 add png of branch-management-strategy
+7dceab6 Merge branch 'dev'
+c8c0266 add png of resolve-the-merge-conflict
+6b87ce8 merge feature1 into master, resolve the merge conflict of git-tutorial-by-liaoxuefeng.md
+bb58574 modify markdown of git-tutorial-by-liaoxuefeng.md(更新分支管理部分，未全部完成).
+391fd20 add png of create-a-new-branch, png of merge-branch-into-current-HEAD, modify markdown of git-tutorial-by-liaoxuefeng.md(更新分支管理部分，未全部完成).
+8334be5 add png of add-a-remote-repository, png of clone-from-a-remote-repository, modify markdown of git-tutorial-by-liaoxuefeng(更新远程仓库部分).
+c97e35d add png of adding-a-new-ssh-key-to-your-github-account, jpeg of git, markdown of git-tutorial-by-liaoxuefeng
+66a7ef7 first commit and add markdown of README
+$ git tag -a V0.1 -m 'first commit' 66a7ef7
+$ git tag
+V0.1
+V0.8
+$ git show V0.1
+tag V0.1
+Tagger: jason <623409222@qq.com>
+Date:   Wed Dec 6 22:40:40 2017 +0800
+
+first commit
+
+commit 66a7ef708dc0853090e747a0784f8701b06423fe (tag: V0.1)
+Author: jason <623409222@qq.com>
+Date:   Thu Nov 23 14:10:15 2017 +0800
+
+    first commit and add markdown of README
+
+diff --git a/README.md b/README.md
+new file mode 100644
+index 0000000..f5129a3
+--- /dev/null
++++ b/README.md
+@@ -0,0 +1 @@
++# study-notes-of-git
+```
 
 ### 管理标签
+本地创建标签后，使用`git push --tags`推送全部标签至远程仓库。
+```
+$ git push --tags
+对象计数中: 1, 完成.
+写入对象中: 100% (1/1), 156 bytes | 22.00 KiB/s, 完成.
+Total 1 (delta 0), reused 0 (delta 0)
+To github.com:jason-ding13/study-notes-of-git.git
+ * [new tag]         V0.1 -> V0.1
+ * [new tag]         V0.8 -> V0.8
+```
+
+对于需要删除的标签，使用`git tag -d <tagname>`删除本地标签。  
+对于远程仓库的标签，使用`git push -d [<repository> [<refspec>]]`
+```
+$ pwd
+/home/jason/Repository/study-notes-of-git
+$ git tag -d V0.1
+已删除标签 'V0.1'（曾为 949e58d）
+$ git push -d origin V0.1
+To github.com:jason-ding13/study-notes-of-git.git
+ - [deleted]         V0.1
+```
 
 ## 自定义git
-
 ### 忽略特殊文件
- 
+对于某些不希望被提交，但是需要存放在版本库中的文件，如`__pycache__/`目录以及目录下的临时文件，  
+当使用`git status`将显示这些文件未跟踪。  
+为了使git忽略这些文件，可以在版本库的根目录下编写`.gitignore`。
+
+在`study-notes-of-git`目录下新建空文件`.gitignore`。  
+使用`git status`显示存在未跟踪文件`.gitignore`。
+```
+$ pwd
+/home/jason/Repository/study-notes-of-git
+$ git status
+位于分支 master
+您的分支与上游分支 'origin/master' 一致。
+未跟踪的文件:
+  （使用 "git add <文件>..." 以包含要提交的内容）
+
+	.gitignore
+
+提交为空，但是存在尚未跟踪的文件（使用 "git add" 建立跟踪）
+```
+
+如下编写`.gitignore`，使git忽略新建的`.gitignore`。
+```
+.gitignore
+```
+
+再次使用`git status`显示干净的工作区。  
+再次修改`.gitignore`为空文件取消忽略才可添加`.gitgnore`至版本库。
+```
+$ pwd
+/home/jason/Repository/study-notes-of-git
+$ git status
+位于分支 master
+您的分支与上游分支 'origin/master' 一致。
+无文件要提交，干净的工作区 
+$ > .gitignore
+$ git status
+位于分支 master
+您的分支与上游分支 'origin/master' 一致。
+未跟踪的文件:
+  （使用 "git add <文件>..." 以包含要提交的内容）
+
+	.gitignore
+
+提交为空，但是存在尚未跟踪的文件（使用 "git add" 建立跟踪）
+$ git add .gitignore
+$ git commit -m 'add .gitignore'
+[master 24fb309] add .gitignore
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 .gitignore
+```
+
+这是一组来自github官方的[`.gitignore模板集合`](https://github.com/github/gitignore)。  
+最后引用原文对忽略原则的描述：
+> 忽略文件的原则是：
+1.忽略操作系统自动生成的文件，比如缩略图等；
+2.忽略编译生成的中间文件、可执行文件等，也就是如果一个文件是通过另一个文件自动生成的，那自动生成的文件就没必要放进版本库，比如Java编译产生的.class文件；
+3.忽略你自己的带有敏感信息的配置文件，比如存放口令的配置文件。
+
 ### 配置别名
- 
+配置别名对于个人而言不赞成。  
+**跳过**
+
 ### 搭建git服务器
+在本地服务器搭建远程仓库的学习待实际多人协作时再做记录。
+**跳过**
 
 ## 总结
+**精力不是无限，学习应该抓住重点。**  
+**当然集中注意力是保持精力的重点。**
+
